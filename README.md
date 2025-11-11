@@ -63,13 +63,13 @@ Make sure you have installed:
  Add Voice-to-Text Notes
 
 
- ###🧑‍💻 Author
+🧑‍💻 Author
 
 👤 Anusan A
 💼 Computer Science Student | Full Stack Developer | Cybersecurity Enthusiast
 📧 Email Me
 
-###🪪 License
+🪪 License
 
 This project is licensed under the MIT License.
 See the LICENSE
