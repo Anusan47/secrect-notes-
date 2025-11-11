@@ -1,0 +1,38 @@
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+.animated-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none; /* allows clicks to pass through */
+}
+
+.sparkle {
+  position: absolute;
+  background-color: var(--color, #005cff);
+  height: 5px;
+  width: 5px;
+  border-radius: 50%;
+  filter: blur(1px);
+  animation: move 5s ease-in-out;
+}
+
+@keyframes move {
+  0% {
+    opacity: 0;
+    transform: translate(0, 100%);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(500%, -100%);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(1000%, 100%);
+  }
+}

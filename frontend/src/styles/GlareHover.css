@@ -1,0 +1,44 @@
+/* GlareHover.css */
+.glare-hover {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+  border-radius: var(--gh-br, 10px);
+  width: var(--gh-width, 500px);
+  height: var(--gh-height, 500px);
+  background: var(--gh-bg, #000);
+  border: 1px solid var(--gh-border, #333);
+  transition: transform var(--gh-duration, 650ms) ease-in-out;
+}
+
+.glare-hover::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--gh-size, 250%);
+  height: var(--gh-size, 250%);
+  background: conic-gradient(
+    from var(--gh-angle, -45deg),
+    var(--gh-rgba, rgba(255, 255, 255, 0.5)),
+    transparent 70%
+  );
+  transform: translate(-50%, -50%) rotate(0deg);
+  transition: opacity var(--gh-duration, 650ms) ease-in-out;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.glare-hover:hover::before {
+  opacity: 1;
+  animation: rotate-glare var(--gh-duration, 650ms) linear infinite;
+}
+
+@keyframes rotate-glare {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
