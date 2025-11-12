@@ -1,4 +1,8 @@
 import express from "express";
+import multer from "multer";
+import path from "path";
+import fs from "fs";
+import { fileURLToPath } from "url";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
@@ -11,6 +15,59 @@ const router = express.Router();
 
 const COOKIE_NAME = process.env.COOKIE_NAME || "auth_token";
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "7d";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// ✅ Ensure uploads directory exists
+const uploadDir = path.join(__dirname, "../uploads/profile");
+if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
+
+// ✅ Configure Multer storage
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, uploadDir);
+  },
+  filename: function (req, file, cb) {
+    const uniqueName = `${Date.now()}_${file.originalname.replace(/\s+/g, "_")}`;
+    cb(null, uniqueName);
+  },
+});
+
+const upload = multer({
+  storage,
+  fileFilter: (req, file, cb) => {
+    const allowed = ["image/png", "image/jpeg", "image/jpg"];
+    if (!allowed.includes(file.mimetype)) {
+      return cb(new Error("Only .jpg, .jpeg, .png formats allowed!"));
+    }
+    cb(null, true);
+  },
+});
+
+// ✅ Upload Profile Photo Route
+router.put("/profile-photo", verifyToken, upload.single("photo"), async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ message: "No file uploaded." });
+
+    const photoURL = `${req.protocol}://${req.get("host")}/uploads/profile/${req.file.filename}`;
+
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user.id,
+      { profilePic: photoURL },
+      { new: true }
+    );
+    return res.json({ profilePic: photoURL });
+
+
+    if (!updatedUser) return res.status(404).json({ message: "User not found." });
+
+    return res.json({ profilePic: updatedUser.profilePic });
+  } catch (error) {
+    console.error("❌ Upload error:", error);
+    return res.status(500).json({ message: "Failed to upload profile photo." });
+  }
+});
 
 // ✅ Register
 router.post("/register", registerValidator, async (req, res) => {
@@ -89,7 +146,7 @@ router.post("/forgot", async (req, res) => {
     const user = await User.findOne({ email });
     if (!user)
       return res.json({
-        message: "If that email exists, a reset link will be sent",
+        message: "No linked account",
       });
 
     const token = crypto.randomBytes(32).toString("hex");
@@ -167,6 +224,28 @@ router.get("/profile", verifyToken, async (req, res) => {
     });
   } catch (err) {
     res.status(500).json({ message: "Server error" });
+  }
+});
+router.put("/reset-password", verifyToken, async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    const user = await User.findById(req.user.id);
+
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch)
+      return res.status(400).json({ message: "Incorrect current password." });
+
+    if (await bcrypt.compare(newPassword, user.password))
+      return res
+        .status(400)
+        .json({ message: "New password cannot be same as old password." });
+
+    user.password = await bcrypt.hash(newPassword, 10);
+    await user.save();
+
+    res.json({ message: "Password updated successfully." });
+  } catch (err) {
+    res.status(500).json({ message: "Failed to update password." });
   }
 });
 

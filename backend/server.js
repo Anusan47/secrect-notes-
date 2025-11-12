@@ -9,11 +9,16 @@ import authRoutes from "./routes/auth.js";
 import notesRoutes from "./routes/notes.js";
 import cron from "node-cron";
 import Note from "./models/Note.js"; 
+import path from "path";
+import { fileURLToPath } from "url";
+
+
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
 connectDB(process.env.MONGO_URI);
+
 
 // Security middlewares
 app.use(helmet());
@@ -26,6 +31,12 @@ app.use(cors({
   origin: allowedOrigin,
   credentials: true
 }));
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// ✅ Allow frontend to access uploaded photos
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Rate limiter
 const limiter = rateLimit({
