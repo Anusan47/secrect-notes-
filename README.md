@@ -50,6 +50,31 @@ Make sure you have installed:
 
 ---
 
+💡 Future Enhancements
+
+ Add Dark/Light mode toggle
+
+ Add Markdown/Rich Text Editor
+
+ Add Cloud Sync / Share Notes
+
+ Add Export to PDF
+
+ Add Voice-to-Text Notes
+
+
+🧑‍💻 Author
+
+👤 Anusan A
+💼 Computer Science Student | Full Stack Developer | Cybersecurity Enthusiast
+📧 Email Me
+
+🪪 License
+
+This project is licensed under the MIT License.
+See the LICENSE
+ file for details.
+
 ### 🪄 Step 1 — Clone the Repository
 
 ```bash
@@ -75,29 +100,3 @@ npm install
 npm start
 
 
-💡 Future Enhancements
-
- Add Dark/Light mode toggle
-
- Add Markdown/Rich Text Editor
-
- Add Cloud Sync / Share Notes
-
- Add Export to PDF
-
- Add Voice-to-Text Notes
-
-
- 🧑‍💻 Author
-
-👤 Anusan A
-💼 Computer Science Student | Full Stack Developer | Cybersecurity Enthusiast
-📧 Email Me
-
-🌐 GitHub Profile
-
-🪪 License
-
-This project is licensed under the MIT License.
-See the LICENSE
- file for details.
