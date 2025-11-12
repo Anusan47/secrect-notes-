@@ -1,29 +1,24 @@
-import React, { useContext, useEffect, useRef } from "react";
-import { AuthContext } from "../contexts/AuthContext";
+import React, { useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { gsap } from "gsap";
 
 export default function Navbar() {
-  const { logout } = useContext(AuthContext);
   const nav = useNavigate();
   const location = useLocation();
   const buttonRefs = useRef([]);
   const circleRefs = useRef([]);
   const tlRefs = useRef([]);
 
-  // ✅ Removed "Archived"
   const navItems = [
     { label: "Notes", path: "/" },
     { label: "Profile", path: "/profile" },
-    { label: "Trash", path: "/trash" }, // optional: added Trash button
   ];
 
   const isActive = (path) =>
     location.pathname === path
       ? "bg-white text-black"
-      : "text-gray-100 hover:text-white";
+      : "text-gray-200 hover:text-white";
 
-  // 🔄 Setup hover animations
   useEffect(() => {
     buttonRefs.current.forEach((btn, i) => {
       const circle = circleRefs.current[i];
@@ -59,15 +54,25 @@ export default function Navbar() {
     });
   }, []);
 
-  const handleEnter = (i) => tlRefs.current[i]?.play();
-  const handleLeave = (i) => tlRefs.current[i]?.reverse();
+  const handleEnter = (i) => {
+    const path = navItems[i].path;
+    // ❌ Prevent hover animation for active button
+    if (location.pathname === path) return;
+    tlRefs.current[i]?.play();
+  };
 
-  // 🧠 Reset hover animations when route changes
+  const handleLeave = (i) => {
+    const path = navItems[i].path;
+    if (location.pathname === path) return;
+    tlRefs.current[i]?.reverse();
+  };
+
+  // 🧠 Reset hover animation for active button on route change
   useEffect(() => {
-    tlRefs.current.forEach((tl, i) => {
-      const path = navItems[i]?.path;
-      if (location.pathname === path) {
-        tl?.reverse();
+    navItems.forEach((item, i) => {
+      const tl = tlRefs.current[i];
+      if (location.pathname === item.path) {
+        tl?.reverse(0); // ✅ Instantly reverse hover animation for active one
       }
     });
   }, [location.pathname]);
@@ -112,39 +117,21 @@ export default function Navbar() {
             <span
               ref={(el) => (circleRefs.current[i] = el)}
               className="absolute left-1/2 bottom-0 bg-white rounded-full opacity-70"
-              style={{
-                width: 0,
-                height: 0,
-              }}
             />
 
             {/* Default text */}
-            <span className="pill-label relative z-10 block">{item.label}</span>
+            <span className="pill-label relative z-10 block text-gray-500">{item.label}</span>
 
             {/* Hover text */}
             <span
               className="pill-label-hover absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-black font-semibold z-20"
-              style={{
-                pointerEvents: "none",
-              }}
+              style={{ pointerEvents: "none" }}
               aria-hidden="true"
             >
               {item.label}
             </span>
           </button>
         ))}
-
-        {/* Logout Button */}
-        <button
-          onClick={() => {
-            logout();
-            nav("/login");
-          }}
-          className="bg-red-500/80 hover:bg-red-500 text-white px-5 py-2 rounded-full text-sm font-medium 
-                     transition transform hover:scale-105"
-        >
-          Logout
-        </button>
       </div>
     </nav>
   );
